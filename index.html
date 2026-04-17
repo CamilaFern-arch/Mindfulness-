@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title> </title> <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content=" ">
+  
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/628/628283.png">
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/628/628283.png">
+
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { 
+      background: #f5f0eb; 
+      font-family: 'Jost', sans-serif; 
+      overflow-x: hidden;
+      height: 100%;
+    }
+    
+    /* Scroll suave y estético */
+    ::-webkit-scrollbar { width: 0px; }
+
+    @keyframes breathe {
+      0%, 100% { transform: scale(1); opacity: 0.7; }
+      50% { transform: scale(1.15); opacity: 1; filter: blur(1px); }
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(0px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(-150px) rotate(25deg); opacity: 0; }
+    }
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes ringPulse {
+      0% { box-shadow: 0 0 0 0 rgba(162, 190, 160, 0.6); }
+      70% { box-shadow: 0 0 0 15px rgba(162, 190, 160, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(162, 190, 160, 0); }
+    }
+    @keyframes celebrate {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .safe-area-top { height: env(safe-area-inset-top); background: transparent; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    const palette = {
+      sage:    { bg: "#a2bea0", soft: "#dce8db", text: "#3d5c3b", glow: "rgba(162,190,160,0.3)" },
+      sky:     { bg: "#8fb8d0", soft: "#d8eaf3", text: "#2a4f63", glow: "rgba(143,184,208,0.3)" },
+      sand:    { bg: "#c9a97a", soft: "#f0e3cf", text: "#6b4e2a", glow: "rgba(201,169,122,0.3)" },
+      blush:   { bg: "#d4a5a5", soft: "#f5e3e3", text: "#6b3030", glow: "rgba(212,165,165,0.3)" },
+      lavender:{ bg: "#b5a8d4", soft: "#e8e3f5", text: "#3d3060", glow: "rgba(181,168,212,0.3)" },
+    };
+
+    const routineData = {
+      Lunes: {
+        title: "Despertar suave",
+        subtitle: "Pilates de inicio · 18 min",
+        type: "PILATES", pal: "sage", emoji: "🌱",
+        affirmation: "Mi cuerpo se despierta con gratitud",
+        exercises: [
+          { name: "Respiración consciente", duration: "2 min", icon: "🌬️", desc: "Inhala 4 tiempos, exhala 6. Acostada boca arriba." },
+          { name: "Rueda de columna", duration: "3 min", icon: "🌀", desc: "Sentada, redondea la espalda vértebra por vértebra." },
+          { name: "El puente", duration: "3 min", icon: "🌉", desc: "Boca arriba, eleva caderas lentamente." },
+          { name: "Gato-vaca", duration: "3 min", icon: "🐱", desc: "En cuatro apoyos, alterna arquear y redondear." },
+          { name: "Relajación", duration: "3 min", icon: "☁️", desc: "Posición fetal o savasana. Deja ir la tensión." },
+        ],
+      },
+      Martes: {
+        title: "Fluir con calma",
+        subtitle: "Yoga dulce · 20 min",
+        type: "YOGA", pal: "sky", emoji: "🌊",
+        affirmation: "Fluyo con lo que la vida me trae",
+        exercises: [
+          { name: "Montaña", duration: "2 min", icon: "⛰️", desc: "De pie, pies juntos, respira y siente el suelo." },
+          { name: "Saludo al sol", duration: "5 min", icon: "☀️", desc: "Secuencia suave: de pie, plancha, perro abajo." },
+          { name: "Guerrera I", duration: "3 min", icon: "🦁", desc: "Pierna adelante doblada, brazos al cielo." },
+          { name: "El árbol", duration: "3 min", icon: "🌳", desc: "Un pie en pantorrilla. Manos en el corazón." },
+          { name: "Savasana", duration: "3 min", icon: "✨", desc: "Completamente quieta. Observa tu respiración." },
+        ],
+      },
+      Miercoles: {
+        title: "Centro y raíces",
+        subtitle: "Meditación · 15 min",
+        type: "MEDITACIÓN", pal: "sand", emoji: "🕯️",
+        affirmation: "Estoy en paz con quien soy hoy",
+        exercises: [
+          { name: "Espacio de paz", duration: "2 min", icon: "🌿", desc: "Siéntate cómoda. Cierra los ojos." },
+          { name: "Respiración 4-7-8", duration: "4 min", icon: "🌬️", desc: "Inhala 4, retén 7, exhala 8." },
+          { name: "Escaneo corporal", duration: "4 min", icon: "🧘‍♀️", desc: "Recorre mentalmente de pies a cabeza." },
+          { name: "Gratitud", duration: "5 min", icon: "💛", desc: "Piensa en 3 cosas por las que hoy das gracias." },
+        ],
+      },
+      Jueves: {
+        title: "Fuerza interior",
+        subtitle: "Mix Bienestar · 20 min",
+        type: "MIXTO", pal: "blush", emoji: "🌸",
+        affirmation: "Cada día me vuelvo más fuerte",
+        exercises: [
+          { name: "Activación core", duration: "3 min", icon: "🌀", desc: "Boca arriba, ombligo adentro suavemente." },
+          { name: "Piernas mesa", duration: "3 min", icon: "🦵", desc: "Baja una pierna a la vez sin perder el centro." },
+          { name: "Perro abajo", duration: "5 min", icon: "🐾", desc: "V invertida. Estira toda tu espalda." },
+          { name: "Torsión sentada", duration: "4 min", icon: "🌀", desc: "Gira el torso suavemente a cada lado." },
+          { name: "Cierre", duration: "5 min", icon: "🌙", desc: "Postura del niño. Respira profundo." },
+        ],
+      },
+      Viernes: {
+        title: "Soltar la semana",
+        subtitle: "Yoga restaurativo · 18 min",
+        type: "YOGA", pal: "lavender", emoji: "🌙",
+        affirmation: "Merezco descansar y recibir",
+        exercises: [
+          { name: "Pared", duration: "4 min", icon: "🌿", desc: "Piernas apoyadas en la pared. Descanso total." },
+          { name: "Mariposa", duration: "4 min", icon: "🦋", desc: "Boca arriba, plantas de los pies juntas." },
+          { name: "Torsión suave", duration: "5 min", icon: "🌀", desc: "Rodillas al pecho, cáelas a un lado." },
+          { name: "Savasana profunda", duration: "5 min", icon: "✨", desc: "Suelta todo. Nada que hacer. Solo ser." },
+        ],
+      },
+    };
+
+    const days = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes"];
+    const mantras = [
+      "Respira. Estás exactamente donde debes estar 🌿",
+      "Tu práctica es un regalo para ti 🌸",
+      "El descanso también es progreso ✨",
+      "Confía en tu proceso con amor 💛",
+    ];
+
+    function BreathingOrb({ color, glow }) {
+      return (
+        <div style={{
+          width: 90, height: 90, borderRadius: "50%",
+          background: `radial-gradient(circle at 35% 35%, ${color}, ${color}aa)`,
+          boxShadow: `0 0 30px ${glow}, inset 0 0 20px rgba(255,255,255,0.4)`,
+          animation: "breathe 6s ease-in-out infinite",
+          margin: "10px auto 20px",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: 32,
+        }}>
+          ✨
+        </div>
+      );
+    }
+
+    function App() {
+      const todayJS = new Date().getDay();
+      const dayMap = { 1:"Lunes", 2:"Martes", 3:"Miercoles", 4:"Jueves", 5:"Viernes" };
+      const [selectedDay, setSelectedDay] = useState(dayMap[todayJS] || "Lunes");
+      const [done, setDone] = useState(() => JSON.parse(localStorage.getItem("done-v2") || "{}"));
+      const [completedDays, setCompletedDays] = useState(() => JSON.parse(localStorage.getItem("comp-v2") || "{}"));
+      const [mantraIdx, setMantraIdx] = useState(0);
+      const [showCelebrate, setShowCelebrate] = useState(false);
+      const [petals, setPetals] = useState([]);
+
+      const routine = routineData[selectedDay];
+      const pal = palette[routine.pal];
+
+      useEffect(() => {
+        const t = setInterval(() => setMantraIdx(i => (i + 1) % mantras.length), 6000);
+        return () => clearInterval(t);
+      }, []);
+
+      const doneEx = routine.exercises.filter((_, i) => done[`${selectedDay}-${i}`]).length;
+      const progress = Math.round((doneEx / routine.exercises.length) * 100);
+
+      const toggleExercise = (idx) => {
+        const key = `${selectedDay}-${idx}`;
+        const updated = { ...done, [key]: !done[key] };
+        setDone(updated);
+        localStorage.setItem("done-v2", JSON.stringify(updated));
+
+        if (!done[key] && routine.exercises.every((_, i) => i === idx ? true : updated[`${selectedDay}-${i}`])) {
+          spawnPetals();
+          setShowCelebrate(true);
+          const d2 = { ...completedDays, [selectedDay]: true };
+          setCompletedDays(d2);
+          localStorage.setItem("comp-v2", JSON.stringify(d2));
+          setTimeout(() => setShowCelebrate(false), 3000);
+        }
+      };
+
+      const spawnPetals = () => {
+        setPetals(Array.from({ length: 12 }, (_, i) => ({
+          id: Date.now() + i,
+          x: Math.random() * 90,
+          emoji: ["🌸","✨","🌿"][Math.floor(Math.random()*3)],
+          delay: Math.random() * 0.5
+        })));
+        setTimeout(() => setPetals([]), 2000);
+      };
+
+      return (
+        <div style={{ minHeight: "100vh", position: "relative", paddingBottom: "40px" }}>
+          <div className="safe-area-top" />
+          
+          {/* Blobs decorativos */}
+          <div style={{
+            position: "fixed", top: "-10%", right: "-10%", width: 300, height: 300,
+            background: pal.soft, filter: "blur(60px)", borderRadius: "50%", zIndex: -1, opacity: 0.6
+          }} />
+
+          {petals.map(p => (
+            <div key={p.id} style={{
+              position: "fixed", left: `${p.x}%`, bottom: "20%", zIndex: 1000,
+              animation: `floatUp 2s ease-out ${p.delay}s forwards`, fontSize: 24
+            }}>{p.emoji}</div>
+          ))}
+
+          <div style={{ maxWidth: 450, margin: "0 auto", padding: "20px" }}>
+            
+            <header style={{ textAlign: "center", marginBottom: 30 }}>
+              <p style={{ letterSpacing: 4, fontSize: 11, color: pal.bg, textTransform: "uppercase", marginBottom: 4 }}>mi ritual</p>
+              <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 42, fontWeight: 300, color: "#3a3530" }}>Bienestar</h1>
+              <BreathingOrb color={pal.bg} glow={pal.glow} />
+              <p style={{ fontStyle: "italic", color: "#8a8075", fontSize: 14, fontFamily: "'Cormorant Garamond', serif" }}>
+                {mantras[mantraIdx]}
+              </p>
+            </header>
+
+            {/* Selector de Días */}
+            <div style={{ display: "flex", gap: 10, overflowX: "auto", padding: "10px 0", marginBottom: 20 }}>
+              {days.map(day => (
+                <button key={day} onClick={() => setSelectedDay(day)} style={{
+                  flex: "0 0 65px", height: 80, borderRadius: 20, border: "none",
+                  background: day === selectedDay ? pal.bg : "white",
+                  color: day === selectedDay ? "white" : "#a09688",
+                  display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                  boxShadow: day === selectedDay ? `0 10px 20px ${pal.glow}` : "0 4px 10px rgba(0,0,0,0.03)",
+                  transition: "all 0.4s ease", cursor: "pointer"
+                }}>
+                  <span style={{ fontSize: 20, marginBottom: 4 }}>{completedDays[day] ? "✅" : routineData[day].emoji}</span>
+                  <span style={{ fontSize: 10, fontWeight: 600 }}>{day.slice(0,3).toUpperCase()}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Tarjeta Principal */}
+            <div style={{
+              background: "white", borderRadius: 30, padding: 25, 
+              boxShadow: `0 15px 35px rgba(0,0,0,0.05)`, marginBottom: 25,
+              border: `1px solid ${pal.soft}`, animation: "fadeSlideIn 0.6s ease"
+            }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 15 }}>
+                <div>
+                  <span style={{ fontSize: 10, color: pal.bg, fontWeight: 600, letterSpacing: 1 }}>{routine.type}</span>
+                  <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 28, color: "#3a3530" }}>{routine.title}</h2>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <span style={{ fontSize: 24, color: pal.bg, fontFamily: "'Cormorant Garamond', serif" }}>{progress}%</span>
+                </div>
+              </div>
+              <div style={{ height: 6, background: "#f0f0f0", borderRadius: 10, overflow: "hidden" }}>
+                <div style={{ width: `${progress}%`, height: "100%", background: pal.bg, transition: "width 1s ease" }} />
+              </div>
+            </div>
+
+            {/* Lista de Ejercicios */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 15 }}>
+              {routine.exercises.map((ex, i) => {
+                const isDone = done[`${selectedDay}-${i}`];
+                return (
+                  <div key={i} onClick={() => toggleExercise(i)} style={{
+                    background: "white", padding: 18, borderRadius: 22,
+                    display: "flex", alignItems: "center", gap: 15,
+                    boxShadow: isDone ? "none" : "0 5px 15px rgba(0,0,0,0.02)",
+                    border: `1.5px solid ${isDone ? pal.bg : "transparent"}`,
+                    opacity: isDone ? 0.7 : 1,
+                    transition: "all 0.3s ease", transform: isDone ? "scale(0.98)" : "scale(1)"
+                  }}>
+                    <div style={{
+                      width: 28, height: 28, borderRadius: "50%", 
+                      border: `2px solid ${pal.bg}`, background: isDone ? pal.bg : "transparent",
+                      display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: 12
+                    }}>{isDone && "✓"}</div>
+                    <div style={{ flex: 1 }}>
+                      <h4 style={{ fontSize: 15, color: "#3a3530", fontWeight: 500 }}>{ex.name}</h4>
+                      <p style={{ fontSize: 12, color: "#a09688" }}>{ex.desc}</p>
+                    </div>
+                    <span style={{ fontSize: 10, color: pal.bg, fontWeight: 600 }}>{ex.duration}</span>
+                  </div>
+                );
+              })}
+            </div>
+
+          </div>
+
+          {/* Modal de éxito */}
+          {showCelebrate && (
+            <div style={{
+              position: "fixed", inset: 0, background: "rgba(255,255,255,0.9)",
+              display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2000,
+              backdropFilter: "blur(10px)", animation: "fadeSlideIn 0.4s ease"
+            }}>
+              <div style={{ textAlign: "center", animation: "celebrate 0.5s ease" }}>
+                <div style={{ fontSize: 60, marginBottom: 20 }}>🌿</div>
+                <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 32 }}>Sesión Completada</h2>
+                <p style={{ color: "#a09688", marginTop: 10 }}>Has cultivado tu paz interior hoy.</p>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>
